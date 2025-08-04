@@ -1,0 +1,17 @@
+name = "QEDFactorization"
+uuid = "34e6992a-37ee-4e99-8345-6cb11d70fa03"
+authors = ["Youjack <iamjasonlin@163.com>"]
+version = "0.1.0"
+
+[deps]
+Cuba = "8a292aeb-7a57-582c-b821-06e4c11590b1"
+HCubature = "19dc6840-f33b-545b-b366-655c7e3ffd49"
+QuadGK = "1fd47b50-473d-5c70-9696-f719f8f3bcdc"
+SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
+cLHAPDF = "633b9f2c-654d-4886-93c1-b219cb2e426c"
+
+# [compat]
+# Cuba = "2.3.0"
+# HCubature = "1.7.0"
+# QuadGK = "2.11.2"
+# SpecialFunctions = "2.5.1"
