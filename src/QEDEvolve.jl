@@ -8,9 +8,10 @@ export evolve_αEM_from_μ₀²_to_μ²
 export fll_toy, f̂ll₀_toy
 export fll_nlo, f̂ll₀
 export fγl_nlo, f̂γl₀
-export Dll_nlo, D̂ll₀
-export Dγl_nlo, D̂γl₀
+export gll_nlo, ĝll₀
+export gγl_nlo, ĝγl₀
 export evolve_nonsinglet_f̂_from_μ₀²_to_μ², evolve_singlet_f̂_from_μ₀²_to_μ²
+export evolve_nonsinglet_ĝ_from_μ₀²_to_μ², evolve_singlet_ĝ_from_μ₀²_to_μ²
 export mellin_inv_integrand, mellin_inv
 export integrate_distribution
 
@@ -36,14 +37,26 @@ end
 
 #= Splitting kernels ==============================================================================#
 
-"Mellin moment of `l→l` splitting kernel."
+struct SplittingKernel{F1,F2,F3,F4}
+    P̂ll :: F1
+    P̂γl :: F2
+    P̂lγ :: F3
+    P̂γγ :: F4
+end
+
+# unpolarized
 P̂ll(s) = 3/2 - 1/s - 1/(1+s) - 2( digamma(s) - digamma(1) )
-"Mellin moment of `l→γ` splitting kernel."
 P̂γl(s) = (2 + s + s^2)/((s - 1) * s * (s + 1))
-"Mellin moment of `γ→l` splitting kernel."
 P̂lγ(s) = (2 + s + s^2)/(s * (s + 1) * (s + 2))
-"Mellin moment of `γ→γ` splitting kernel."
 P̂γγ(s) = - 2/3
+const unpolP̂ = SplittingKernel(P̂ll, P̂γl, P̂lγ, P̂γγ)
+
+# helicity
+ΔP̂ll(s) = P̂ll(s)
+ΔP̂γl(s) = (2 + s)/(s * (s + 1))
+ΔP̂lγ(s) = (-1 + s)/(s * (s + 1))
+ΔP̂γγ(s) = P̂γγ(s)
+const helicityP̂ = SplittingKernel(ΔP̂ll, ΔP̂γl, ΔP̂lγ, ΔP̂γγ)
 
 #= QED parton distributions =======================================================================#
 
@@ -55,9 +68,9 @@ f̂ll₀_toy(a, b, s) =
     beta(a+s, 1+b) / beta(1+a, 1+b)
 
 "Fixed order NLO `l→l` distribution."
-fll_nlo(αEM, x, μ₀², μ²) = αEM/2π *
-    (1+x^2)/(1-x) * ( log(μ²/μ₀²) - 2log(1-x) - 1 )
-"Mellin moment of NLO `l→l` distribution at `μ∼μ₀`."
+fll_nlo(αEM, x, m², μ²) = αEM/2π *
+    (1+x^2)/(1-x) * ( log(μ²/m²) - 2log(1-x) - 1 )
+"Mellin moment of NLO `l→l` distribution at `μ∼m`."
 f̂ll₀(αEM, s) = 1 + αEM/2π * (
     -P̂ll(s) +
     #-- from Mathematica --
@@ -68,9 +81,9 @@ f̂ll₀(αEM, s) = 1 + αEM/2π * (
 )
 
 "Fixed order NLO `l→γ` distribution."
-fγl_nlo(αEM, x, μ₀², μ²) = αEM/2π *
-    (1+(1-x)^2)/x * ( log(μ²/μ₀²) - 2log(x) - 1 )
-"Mellin moment of NLO `l→γ` distribution at `μ∼μ₀`."
+fγl_nlo(αEM, x, m², μ²) = αEM/2π *
+    (1+(1-x)^2)/x * ( log(μ²/m²) - 2log(x) - 1 )
+"Mellin moment of NLO `l→γ` distribution at `μ∼m`."
 f̂γl₀(αEM, s) = αEM/2π * (
     -P̂γl(s) +
     #-- from Mathematica --
@@ -78,55 +91,51 @@ f̂γl₀(αEM, s) = αEM/2π * (
     #----------------------
 )
 
-#= QED fragmentation functions ====================================================================#
+"Fixed order NLO `l→l` helicity distribution."
+gll_nlo(αEM, x, m², μ²) = fll_nlo(αEM, x, m², μ²)
+"Mellin moment of NLO `l→l` helicity distribution at `μ∼m`."
+ĝll₀(αEM, s) = f̂ll₀(αEM, s)
 
-"Fixed order NLO `l→l` fragmentation function."
-Dll_nlo(αEM, z, μ₀², μ²) = αEM/2π *
-    (1+z^2)/(1-z) * ( log(μ²/μ₀²) + 2log(z) - 2log(1-z) - 1 )
-"Mellin moment of NLO `l→l` fragmentation function at `μ∼μ₀`."
-D̂ll₀(αEM, s) = f̂ll₀(αEM, s) + αEM/2π * (
+"Fixed order NLO `l→γ` helicity distribution."
+gγl_nlo(αEM, x, m², μ²) = αEM/2π *
+    (2-x) * ( log(μ²/m²) - 2log(x) - (1-x)/(2-x) )
+"Mellin moment of NLO `l→γ` helicity distribution at `μ∼m`."
+ĝγl₀(αEM, s) = αEM/2π * (
     #-- from Mathematica --
-    2*(s^(-2) + (1 + s)^(-2) - 2*trigamma(s))
+    (4 + s * (7 + s))/(s^2 * (1 + s)^2)
     #----------------------
 )
 
-"Fixed order NLO `l→γ` fragmentation function."
-Dγl_nlo(αEM, z, μ₀², μ²) = αEM/2π *
-    (1+(1-z)^2)/z * ( log(μ²/μ₀²) - 1 )
-"Mellin moment of NLO `l→γ` fragmentation function at `μ∼μ₀`."
-D̂γl₀(αEM, s) = αEM/2π *
-    -P̂γl(s)
-
-# DGLAP evolutions ---------------------------------------------------------------------------------
+#= DGLAP evolutions ===============================================================================#
 
 """
-    evolve_nonsinglet_f̂_from_μ₀²_to_μ²(αEM, f̂::Function, μ₀², μ², nf)::Function
+    evolve_nonsinglet_from_μ₀²_to_μ²(P::SplittingKernel, αEM, f̂::Function, μ₀², μ², nf)::Function
 
 Evolve `l→(l-l̄)` distribution from `μ₀²` to `μ²`. \\
 Threshold crossing is not considered.
 """
-function evolve_nonsinglet_f̂_from_μ₀²_to_μ²(αEM::Real, f̂::Function,
+function evolve_nonsinglet_from_μ₀²_to_μ²(P::SplittingKernel, αEM::Real, f̂::Function,
         μ₀²::Real, μ²::Real, nf::Int)::Function
     s -> let
         if iszero(nf) return f̂(s) end
         αEM_ratio = αEM / evolve_αEM_from_μ₀²_to_μ²(αEM, μ₀², μ², nf)
-        return αEM_ratio^( P̂ll(s) /( 2π * β₀(nf) ) ) * f̂(s)
+        return αEM_ratio^( P.P̂ll(s) /( 2π * β₀(nf) ) ) * f̂(s)
     end
 end
 """
-    evolve_singlet_f̂_from_μ₀²_to_μ²(αEM, f̂::Function, μ₀², μ², nf)::Function
+    evolve_singlet_from_μ₀²_to_μ²(P′::SplittingKernel, αEM, f̂::Function, μ₀², μ², nf)::Function
 
 Evolve `l→(l+l̄)` and `l→γ` distributions from `μ₀²` to `μ²`. \\
 `f̂` should be `Vector`-valued. \\
 Threshold crossing is not considered.
 """
-function evolve_singlet_f̂_from_μ₀²_to_μ²(αEM::Real, f̂::Function,
+function evolve_singlet_from_μ₀²_to_μ²(P′::SplittingKernel, αEM::Real, f̂::Function,
         μ₀²::Real, μ²::Real, nf::Int)::Function
     s -> let
         if iszero(nf) return f̂(s) end
         αEM_ratio = αEM / evolve_αEM_from_μ₀²_to_μ²(αEM, μ₀², μ², nf)
         I = [ 1 0; 0 1 ]
-        P = [ P̂ll(s) 2P̂lγ(s); P̂γl(s) P̂γγ(s) ]
+        P = [ P′.P̂ll(s) 2P′.P̂lγ(s); P′.P̂γl(s) P′.P̂γγ(s) ]
         λ₊ = 1/2 * ( P[1,1] + P[2,2] + sqrt( (P[1,1] - P[2,2])^2 + 4 * P[1,2] * P[2,1] ) )
         λ₋ = 1/2 * ( P[1,1] + P[2,2] - sqrt( (P[1,1] - P[2,2])^2 + 4 * P[1,2] * P[2,1] ) )
         U = (P - λ₋ * I)/(λ₊ - λ₋) * αEM_ratio^( λ₊ /( 2π * β₀(nf) ) ) +
@@ -134,6 +143,52 @@ function evolve_singlet_f̂_from_μ₀²_to_μ²(αEM::Real, f̂::Function,
         return U * f̂(s)
     end
 end
+
+"""
+    evolve_nonsinglet_f̂_from_μ₀²_to_μ²(αEM, f̂::Function, μ₀², μ², nf)::Function
+
+Evolve `l→(l-l̄)` unpolarized distribution from `μ₀²` to `μ²`. \\
+Threshold crossing is not considered.
+"""
+function evolve_nonsinglet_f̂_from_μ₀²_to_μ²(αEM::Real, f̂::Function,
+        μ₀²::Real, μ²::Real, nf::Int)::Function
+    return evolve_nonsinglet_from_μ₀²_to_μ²(unpolP̂, αEM, f̂, μ₀², μ², nf)
+end
+"""
+    evolve_singlet_f̂_from_μ₀²_to_μ²(αEM, f̂::Function, μ₀², μ², nf)::Function
+
+Evolve `l→(l+l̄)` and `l→γ` unpolarized distributions from `μ₀²` to `μ²`. \\
+`f̂` should be `Vector`-valued. \\
+Threshold crossing is not considered.
+"""
+function evolve_singlet_f̂_from_μ₀²_to_μ²(αEM::Real, f̂::Function,
+        μ₀²::Real, μ²::Real, nf::Int)::Function
+    return evolve_singlet_from_μ₀²_to_μ²(unpolP̂, αEM, f̂, μ₀², μ², nf)
+end
+
+"""
+    evolve_nonsinglet_ĝ_from_μ₀²_to_μ²(αEM, ĝ::Function, μ₀², μ², nf)::Function
+
+Evolve `l→(l-l̄)` helicity distribution from `μ₀²` to `μ²`. \\
+Threshold crossing is not considered.
+"""
+function evolve_nonsinglet_ĝ_from_μ₀²_to_μ²(αEM::Real, ĝ::Function,
+        μ₀²::Real, μ²::Real, nf::Int)::Function
+    return evolve_nonsinglet_from_μ₀²_to_μ²(helicityP̂, αEM, ĝ, μ₀², μ², nf)
+end
+"""
+    evolve_singlet_ĝ_from_μ₀²_to_μ²(αEM, ĝ::Function, μ₀², μ², nf)::Function
+
+Evolve `l→(l+l̄)` and `l→γ` helicity distributions from `μ₀²` to `μ²`. \\
+`ĝ` should be `Vector`-valued. \\
+Threshold crossing is not considered.
+"""
+function evolve_singlet_ĝ_from_μ₀²_to_μ²(αEM::Real, ĝ::Function,
+        μ₀²::Real, μ²::Real, nf::Int)::Function
+    return evolve_singlet_from_μ₀²_to_μ²(helicityP̂, αEM, ĝ, μ₀², μ², nf)
+end
+
+#= Mellin convolution =============================================================================#
 
 """
     mellin_inv_integrand(f̂::Function, x)::Function

@@ -2,6 +2,7 @@ module QEDFactorization
 
 using cLHAPDF
 
+using QuadGK: quadgk
 using HCubature: hcubature
 using Cuba: vegas, suave, divonne
 
@@ -81,8 +82,8 @@ function qed_conv(f::Function, If::Function, D::Function, ID::Function, H::Funct
             throw(ArgumentError("qed_conv: algorithm $algor not supported."))
         end
     return integral2D +
-        quadgk(ξ -> f(ξ) *( (Θ(ξ,1) ? H(ξ,1) : 0) - (Θ(1,1) ? H(1,1) : 0) ), ξmin,1., rtol=rtol, order=_order)[1] * ID(ζmin) +
-        quadgk(ζ -> D(ζ) *( (Θ(1,ζ) ? H(1,ζ) : 0) - (Θ(1,1) ? H(1,1) : 0) ), ζmin,1., rtol=rtol, order=_order)[1] * If(ξmin) +
+        quadgk(ξ -> f(ξ) *( (Θ(ξ,1) ? H(ξ,1) : 0) - (Θ(1,1) ? H(1,1) : 0) ), ξmin,1., rtol=rtol)[1] * ID(ζmin) +
+        quadgk(ζ -> D(ζ) *( (Θ(1,ζ) ? H(1,ζ) : 0) - (Θ(1,1) ? H(1,1) : 0) ), ζmin,1., rtol=rtol)[1] * If(ξmin) +
         (Θ(1,1) ? H(1,1) : 0) * If(ξmin) * ID(ζmin)
 end
 
