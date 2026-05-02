@@ -15,11 +15,11 @@ $$
 
 ## LHAPDF grid for integrals of LDFs
 
-LDFs actually have "distributional values" at $x=1$, and to calculate their integrals with other functions, we use the subtraction trick:
+LDFs are singular at $x=1$, and to calculate their integrals with other functions, we use the subtraction trick:
 $$
 \int_{x_\mathrm{min}}^1 dx~ f(x) H(x) = \int_{x_\mathrm{min}}^1 dx~ f(x) \big(H(x)-H(1)\big) + H(1) \int_{x_\mathrm{min}}^1 dx~ f(x).
 $$
-The integral in first term of this formula in suppressed at $x=1$, and we can treat $f(x)$ as an ordinary function, that is, the "distributional value" at $x=1$ is thrown away. To calculate the second term, we treat $f(x)$ as a function on $\mathbb{R}$ with vanishing values outside the physical region, and use Mellin transformation:
+The integrand in first term of this formula is suppressed at $x=1$. To calculate the second term, we treat $f(x)$ as a function on $\mathbb{R}$ with vanishing values outside the physical region, and use Mellin transformation:
 $$\begin{aligned}
 \int_{x_\mathrm{min}}^1 dx~ f(x)
 &= \int_{x_\mathrm{min}}^\infty dx~ \mathcal{M}^{-1}[\mathcal{M}[f]](x) \\

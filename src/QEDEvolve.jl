@@ -74,7 +74,7 @@ f̂ll₀_toy(a, b, N) =
 "Fixed order NLO `l→l` distribution."
 fll_nlo(αEM, x, m², μ²) = αEM/2π *
     (1+x^2)/(1-x) * ( log(μ²/m²) - 2log(1-x) - 1 )
-"Mellin moment of NLO `l→l` distribution at `μ∼m`."
+"Mellin moment of NLO `l→l` distribution at `μ=m`."
 f̂ll₀(αEM, N) = 1 + αEM/2π * (
     -P̂ll(N) +
     #-- from Mathematica --
@@ -87,7 +87,7 @@ f̂ll₀(αEM, N) = 1 + αEM/2π * (
 "Fixed order NLO `l→γ` distribution."
 fγl_nlo(αEM, x, m², μ²) = αEM/2π *
     (1+(1-x)^2)/x * ( log(μ²/m²) - 2log(x) - 1 )
-"Mellin moment of NLO `l→γ` distribution at `μ∼m`."
+"Mellin moment of NLO `l→γ` distribution at `μ=m`."
 f̂γl₀(αEM, N) = αEM/2π * (
     -P̂γl(N) +
     #-- from Mathematica --
@@ -97,13 +97,13 @@ f̂γl₀(αEM, N) = αEM/2π * (
 
 "Fixed order NLO `l→l` helicity distribution."
 gll_nlo(αEM, x, m², μ²) = fll_nlo(αEM, x, m², μ²)
-"Mellin moment of NLO `l→l` helicity distribution at `μ∼m`."
+"Mellin moment of NLO `l→l` helicity distribution at `μ=m`."
 ĝll₀(αEM, N) = f̂ll₀(αEM, N)
 
 "Fixed order NLO `l→γ` helicity distribution."
 gγl_nlo(αEM, x, m², μ²) = αEM/2π *
     (2-x) * ( log(μ²/m²) - 2log(x) - (1-x)/(2-x) )
-"Mellin moment of NLO `l→γ` helicity distribution at `μ∼m`."
+"Mellin moment of NLO `l→γ` helicity distribution at `μ=m`."
 ĝγl₀(αEM, N) = αEM/2π * (
     #-- from Mathematica --
     (4 + N * (7 + N))/(N^2 * (1 + N)^2)
@@ -112,13 +112,13 @@ ĝγl₀(αEM, N) = αEM/2π * (
 
 "Fixed order NLO `l→l` fragmentation function."
 Dll_nlo(αEM, x, m², μ²) = fll_nlo(αEM, x, m², μ²)
-"Mellin moment of NLO `l→l` fragmentation function at `μ∼m`."
+"Mellin moment of NLO `l→l` fragmentation function at `μ=m`."
 D̂ll₀(αEM, N) = f̂ll₀(αEM, N)
 
 "Fixed order NLO `γ→l` fragmentation function."
 Dlγ_nlo(αEM, x, m², μ²) = αEM/2π *
     (x^2+(1-x)^2) * log(μ²/m²)
-"Mellin moment of NLO `γ→l` fragmentation function at `μ∼m`."
+"Mellin moment of NLO `γ→l` fragmentation function at `μ=m`."
 D̂lγ₀(αEM, N) = 0.0
 
 #= DGLAP evolutions ===============================================================================#
